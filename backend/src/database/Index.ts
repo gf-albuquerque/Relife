@@ -4,7 +4,7 @@ require("dotenv/config");
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  url: "postgres://relifeadmin:j1tkBPr3qUNePgjjLHcWTseLYilb8S0v@dpg-cdshdd1a6gdu2488r3dg-a/relifedb",
+  url: "postgres://relifeadmin:j1tkBPr3qUNePgjjLHcWTseLYilb8S0v@dpg-cdshdd1a6gdu2488r3dg-a:5432/relifedb",
   synchronize: false,
   logging: false,
   entities: ["./src/entities/*.ts"],
