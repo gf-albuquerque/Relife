@@ -11,7 +11,7 @@ export class InstitutionRepository {
     const result = await institutionRepo
       .createQueryBuilder("institution")
       .leftJoinAndSelect("institution.address", "address")
-      .where("institution_id = :institution_id", { institution_id })
+      .where("institution.institution_id = :institution_id", { institution_id })
       .getOne();
     return result;
   };
@@ -28,7 +28,18 @@ export class InstitutionRepository {
     const result = await institutionRepo
       .createQueryBuilder("institution")
       .leftJoinAndSelect("institution.address", "address")
-      .where("email = :email", { email })
+      .where("institution.email = :email", { email })
+      .getOne();
+    return result;
+  };
+
+  getInstitutionByName = async (institution_name: string) => {
+    const result = await institutionRepo
+      .createQueryBuilder("institution")
+      .leftJoinAndSelect("institution.address", "address")
+      .where("institution.institution_name = :institution_name", {
+        institution_name,
+      })
       .getOne();
     return result;
   };
@@ -36,7 +47,7 @@ export class InstitutionRepository {
   getInstitutionByPhone = async (phone: string) => {
     const result = await institutionRepo
       .createQueryBuilder("institution")
-      .where("phone = :phone", { phone })
+      .where("institution.phone = :phone", { phone })
       .getOne();
     return result;
   };
@@ -46,7 +57,7 @@ export class InstitutionRepository {
       .createQueryBuilder("institution")
       .leftJoinAndSelect("institution.address", "address")
       .addSelect("institution.password")
-      .where("email = :email", { email })
+      .where("institution.email = :email", { email })
       .getOne();
     return result;
   };

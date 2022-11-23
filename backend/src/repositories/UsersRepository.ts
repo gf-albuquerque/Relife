@@ -1,18 +1,23 @@
 import { hash } from "bcryptjs";
 import { AppDataSource } from "../database/Index";
 import { Address } from "../entities/Address";
+import { Institution } from "../entities/Institution";
 import { Organ } from "../entities/Organ";
 import { User } from "../entities/User";
 
 const userRepo = AppDataSource.getRepository(User);
 const addressRepo = AppDataSource.getRepository(Address);
+const institutionRepo = AppDataSource.getRepository(Institution);
+const organRepo = AppDataSource.getRepository(Organ);
 
 export class UsersRepository {
   getById = async (user_id: string) => {
     const result = await userRepo
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.address", "address")
-      .where("user_id = :user_id", { user_id })
+      .leftJoinAndSelect("user.institution", "institution")
+      .leftJoinAndSelect("user.organs", "organs")
+      .where("user.user_id = :user_id", { user_id })
       .getOne();
     return result;
   };
@@ -21,6 +26,8 @@ export class UsersRepository {
     const result = await userRepo
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.address", "address")
+      .leftJoinAndSelect("user.institution", "institution")
+      .leftJoinAndSelect("user.organs", "organs")
       .getMany();
     return result;
   };
@@ -29,7 +36,9 @@ export class UsersRepository {
     const result = await userRepo
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.address", "address")
-      .where("role = DONOR")
+      .leftJoinAndSelect("user.institution", "institution")
+      .leftJoinAndSelect("user.organs", "organs")
+      .where("user.role = DONOR")
       .getMany();
     return result;
   };
@@ -38,7 +47,9 @@ export class UsersRepository {
     const result = await userRepo
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.address", "address")
-      .where("role = RECEIVER")
+      .leftJoinAndSelect("user.institution", "institution")
+      .leftJoinAndSelect("user.organs", "organs")
+      .where("user.role = RECEIVER")
       .getMany();
     return result;
   };
@@ -47,7 +58,9 @@ export class UsersRepository {
     const result = await userRepo
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.address", "address")
-      .where("email = :email", { email })
+      .leftJoinAndSelect("user.institution", "institution")
+      .leftJoinAndSelect("user.organs", "organs")
+      .where("user.email = :email", { email })
       .getOne();
     return result;
   };
@@ -56,7 +69,9 @@ export class UsersRepository {
     const result = await userRepo
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.address", "address")
-      .where("cpf = :cpf", { cpf })
+      .leftJoinAndSelect("user.institution", "institution")
+      .leftJoinAndSelect("user.organs", "organs")
+      .where("user.cpf = :cpf", { cpf })
       .getOne();
     return result;
   };
@@ -65,7 +80,7 @@ export class UsersRepository {
     const result = await userRepo
       .createQueryBuilder("user")
       .addSelect("user.password")
-      .where("email = :email", { email })
+      .where("user.email = :email", { email })
       .getOne();
     return result;
   };
@@ -165,16 +180,35 @@ export class UsersRepository {
 
   updateUserByInstitution = async (
     cpf: string,
-    blood_type: string,
-    organs: Organ[]
+    blood_type?: string,
+    institution_name?: string
   ) => {
     const user = await userRepo.findOne({
       where: { cpf: cpf },
-      relations: { address: true },
+      relations: { address: true, organs: true },
     });
+    const institution = await institutionRepo.findOne({
+      where: { institution_name: institution_name },
+    });
+
     (user.blood_type = blood_type ? blood_type : user.blood_type),
-      (user.organs = organs ? organs : user.organs),
-      await userRepo.save(user);
+      (user.institution = institution ? institution : user.institution);
+
+    await userRepo.save(user);
+    return user;
+  };
+
+  updateOrgansUserByInstitution = async (
+    cpf: string,
+    organs?: Array<Organ>
+  ) => {
+    const user = await userRepo.findOne({
+      where: { cpf: cpf },
+      relations: { address: true, organs: true },
+    });
+
+    (user.organs = organs ? organs : user.organs), await userRepo.save(user);
+    await organRepo.save(organs);
     return user;
   };
 
