@@ -12,7 +12,7 @@ AppDataSource.initialize()
 
     app.use(routes);
 
-    console.log("Server is running");
+    app.listen(3333, () => console.log("Server is running"));
   })
   .catch((err) => {
     console.error("Error during Data Source initialization", err);
