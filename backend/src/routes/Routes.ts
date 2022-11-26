@@ -11,11 +11,7 @@ const swaggerDocument = require("../swagger.json");
 
 var corsOptions = {
   credentials: true,
-  origin: [
-    "http://localhost:3000",
-    "https://relife-lyart.vercel.app",
-    "http://relife-lyart.vercel.app",
-  ],
+  origin: "https://relife-lyart.vercel.app",
 };
 
 const routes = Router();
